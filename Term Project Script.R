@@ -25,8 +25,6 @@ all_load_data <- lapply(filenames, function(i){
   read.xlsx(i,
             sheetIndex=1, 
             rowIndex=c(5:28), 
-            
-            #This always takes 31 days / month, so we'll have to remove some zeros later on.
             colIndex=c(2:32), 
             as.data.frame=TRUE, 
             header=FALSE)})
@@ -54,6 +52,10 @@ time_index <- seq(from = as.POSIXct("2016-01-01 01:00"),
 
 #Create the final hourly xts object by including the time_index
 hourly_xts <- xts(hourly_df, order.by = time_index)
+
+core <- coredata(hourly_xts)
+hourly_msts <- msts(core[,1], seasonal.periods = c(24, 168))
+fit_tbats <- tbats(hourly_msts)
 
 #Set the working directory to be the desktop so we can dump the file.
 setwd("C:/Users/cgervais/Desktop/")
